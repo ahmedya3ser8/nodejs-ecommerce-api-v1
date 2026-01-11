@@ -4,6 +4,7 @@ import morgan from 'morgan';
 
 import dbConnection from './config/database.js';
 import categoryRoute from './routes/category.route.js';
+import subCategoryRoute from './routes/subCategory.route.js';
 import AppError from './utils/AppError.js';
 import globalError from './middlewares/globalError.js';
 
@@ -18,6 +19,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use('/api/v1/categories', categoryRoute);
+app.use('/api/v1/subcategories', subCategoryRoute);
 
 app.use((req, res, next) => {
   next(new AppError(`This resource: ${req.originalUrl} is not available`, 400));
