@@ -8,18 +8,22 @@ import {
 } from '../utils/validators/subCategoryValidator.js';
 
 import { 
-  getAllSubCategory,
+  getAllSubCategories,
   getSpecificSubCategory,
   createSubCategory,
   updateSubCategory,
-  deleteSubCategory
+  deleteSubCategory,
+  setCategoryIdToBody,
+  createFilterObj
 } from '../services/subCategory.service.js';
 
-const router = express.Router();
+// mergeParams -> allow us to access parameters on other routers
+// ex -> we need to access categoryId from category router
+const router = express.Router({ mergeParams: true });
 
 router.route('/')
-  .get(getAllSubCategory)
-  .post(createSubCategoryValidator, createSubCategory)
+  .get(createFilterObj, getAllSubCategories)
+  .post(setCategoryIdToBody, createSubCategoryValidator, createSubCategory)
 
 router.route('/:id')
   .get(getSubCategoryValidator, getSpecificSubCategory)

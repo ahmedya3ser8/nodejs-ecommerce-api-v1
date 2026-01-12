@@ -4,15 +4,24 @@ import SubCategoryModel from '../models/subCategory.model.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
 import AppError from '../utils/AppError.js';
 
+const createFilterObj = (req, res, next) => {
+  let filter = {};
+  if (req.params.categoryId) filter = { category: req.params.categoryId };
+  req.filter = filter;
+  next();
+}
 // @desc    Get All subCategories
 // @route   GET /api/v1/subcategories
 // @access  Public
-const getAllSubCategory = asyncHandler(async (req, res) => {
+const getAllSubCategories = asyncHandler(async (req, res) => {
   const query = req.query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 5;
   const skip = (page - 1) * limit;
-  const subCategories = await SubCategoryModel.find({}, { '__v': false }).limit(limit).skip(skip);
+
+  const subCategories = await SubCategoryModel.find(req.filter, { '__v': false }).limit(limit).skip(skip);
+    // .populate({ path: 'category', select: 'name -_id' });
+
   return res.status(200).json({
     results: subCategories.length,
     data: subCategories
@@ -24,7 +33,10 @@ const getAllSubCategory = asyncHandler(async (req, res) => {
 // @access  Public
 const getSpecificSubCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const subCategory = await SubCategoryModel.findById(id).select('-__v');
+  const subCategory = await SubCategoryModel.findById(id).select('-__v')
+  // .populate({ 
+  //   path: 'category', select: 'name -_id' 
+  // });
   if (!subCategory) {
     return next(new AppError(`No subCategory For This Id ${id}`, 404));
   }
@@ -32,6 +44,12 @@ const getSpecificSubCategory = asyncHandler(async (req, res, next) => {
     data: subCategory
   })
 })
+
+// Nested Route
+const setCategoryIdToBody = (req, res, next) => {
+  if (!req.body.category) req.body.category = req.params.categoryId;
+  next();
+}
 
 // @desc Create subCategory
 // @route POST /api/v1/subcategories
@@ -80,9 +98,11 @@ const deleteSubCategory = asyncHandler(async (req, res, next) => {
 })
 
 export {
-  getAllSubCategory,
+  getAllSubCategories,
   getSpecificSubCategory,
   createSubCategory,
   updateSubCategory,
-  deleteSubCategory
+  deleteSubCategory,
+  setCategoryIdToBody,
+  createFilterObj
 }

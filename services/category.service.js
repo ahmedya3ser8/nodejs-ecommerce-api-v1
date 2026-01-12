@@ -7,7 +7,7 @@ import AppError from '../utils/AppError.js';
 // @desc    Get All Categories
 // @route   GET /api/v1/categories
 // @access  Public
-const getAllCategory = asyncHandler(async (req, res) => {
+const getAllCategories = asyncHandler(async (req, res) => {
   const query = req.query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 5;
@@ -72,7 +72,7 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
 })
 
 export {
-  getAllCategory,
+  getAllCategories,
   getSpecificCategory,
   updateCategory,
   createCategory,
