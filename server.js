@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import dbConnection from './config/database.js';
 import categoryRoute from './routes/category.route.js';
@@ -12,9 +14,14 @@ import globalError from './middlewares/globalError.js';
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dbConnection();
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'uploads')));
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
   console.log(`mode: ${process.env.NODE_ENV}`);
