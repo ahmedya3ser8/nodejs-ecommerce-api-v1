@@ -7,8 +7,8 @@ import {
   deleteProductValidator
 } from '../utils/validators/productValidator.js';
 import { 
-  getAllProducts,
-  getSpecificProduct,
+  getProducts,
+  getProduct,
   createProduct,
   updateProduct,
   deleteProduct
@@ -17,11 +17,11 @@ import {
 const router = express.Router();
 
 router.route('/')
-  .get(getAllProducts)
+  .get(getProducts)
   .post(createProductValidator, createProduct)
 
 router.route('/:id')
-  .get(getProductValidator, getSpecificProduct)
+  .get(getProductValidator, getProduct)
   .put(updateProductValidator, updateProduct)
   .delete(deleteProductValidator, deleteProduct)
 

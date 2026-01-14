@@ -7,8 +7,8 @@ import {
   deleteCategoryValidator 
 } from '../utils/validators/categoryValidator.js';
 import { 
-  getAllCategories, 
-  getSpecificCategory, 
+  getCategories, 
+  getCategory, 
   updateCategory,
   createCategory,
   deleteCategory
@@ -20,11 +20,11 @@ const router = express.Router();
 router.use('/:categoryId/subcategories', subCategoryRoute)
 
 router.route('/')
-  .get(getAllCategories)
+  .get(getCategories)
   .post(createCategoryValidator, createCategory)
 
 router.route('/:id')
-  .get(getCategoryValidator, getSpecificCategory)
+  .get(getCategoryValidator, getCategory)
   .put(updateCategoryValidator, updateCategory)
   .delete(deleteCategoryValidator, deleteCategory)
 

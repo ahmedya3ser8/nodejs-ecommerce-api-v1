@@ -8,8 +8,8 @@ import {
 } from '../utils/validators/subCategoryValidator.js';
 
 import { 
-  getAllSubCategories,
-  getSpecificSubCategory,
+  getSubCategories,
+  getSubCategory,
   createSubCategory,
   updateSubCategory,
   deleteSubCategory,
@@ -22,11 +22,11 @@ import {
 const router = express.Router({ mergeParams: true });
 
 router.route('/')
-  .get(createFilterObj, getAllSubCategories)
+  .get(createFilterObj, getSubCategories)
   .post(setCategoryIdToBody, createSubCategoryValidator, createSubCategory)
 
 router.route('/:id')
-  .get(getSubCategoryValidator, getSpecificSubCategory)
+  .get(getSubCategoryValidator, getSubCategory)
   .put(updateSubCategoryValidator, updateSubCategory)
   .delete(deleteSubCategoryValidator, deleteSubCategory)
 

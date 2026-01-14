@@ -1,4 +1,5 @@
-import { check } from "express-validator";
+import { check, body } from "express-validator";
+import slugify from 'slugify';
 
 import validator from '../../middlewares/validator.js';
 import CategoryModel from '../../models/category.model.js';
@@ -12,7 +13,11 @@ const getProductValidator = [
 const createProductValidator = [
   check('title')
     .notEmpty().withMessage('Title is required')
-    .isLength({ min: 3 }).withMessage('Title must be at least 3 chars'),
+    .isLength({ min: 3 }).withMessage('Title must be at least 3 chars')
+    .custom((value, { req }) => {
+      req.body.slug = slugify(value);
+      return true;
+    }),
   check('description')
     .notEmpty().withMessage('Description is required')
     .isLength({ min: 20 }).withMessage('Too short product description')
@@ -84,6 +89,10 @@ const createProductValidator = [
 
 const updateProductValidator = [
   check('id').isMongoId().withMessage('Invalid id format'),
+  body('title').optional().custom((value, { req }) => {
+    req.body.slug = slugify(value);
+    return true;
+  }),
   validator
 ]
 

@@ -7,8 +7,8 @@ import {
   deleteBrandValidator
 } from '../utils/validators/brandValidator.js';
 import { 
-  getAllBrands,
-  getSpecificBrand,
+  getBrands,
+  getBrand,
   createBrand,
   deleteBrand,
   updateBrand
@@ -17,11 +17,11 @@ import {
 const router = express.Router();
 
 router.route('/')
-  .get(getAllBrands)
+  .get(getBrands)
   .post(createBrandValidator, createBrand)
 
 router.route('/:id')
-  .get(getBrandValidator, getSpecificBrand)
+  .get(getBrandValidator, getBrand)
   .put(updateBrandValidator, updateBrand)
   .delete(deleteBrandValidator, deleteBrand)
 
