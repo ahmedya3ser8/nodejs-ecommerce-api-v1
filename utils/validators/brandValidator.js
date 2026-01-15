@@ -21,7 +21,7 @@ const createBrandValidator = [
 
 const updateBrandValidator = [
   check('id').isMongoId().withMessage('Invalid brand id format'),
-  body('name').custom((value, { req }) => {
+  body('name').optional().custom((value, { req }) => {
     req.body.slug = slugify(value);
     return true;
   }),

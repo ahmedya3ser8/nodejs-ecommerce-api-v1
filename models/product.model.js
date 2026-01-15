@@ -75,4 +75,29 @@ productSchema.pre(/^find/, function() {
   })
 })
 
+const setImageUrl = (doc) => {
+  if (doc.imageCover) {
+    const imageUrl = `${process.env.BASE_URL}/products/${doc.imageCover}`;
+    doc.imageCover = imageUrl;
+  }
+  if (doc.images) {
+    const imagesList = [];
+    doc.images.forEach(img => {
+      const imageUrl = `${process.env.BASE_URL}/products/${img}`;
+      imagesList.push(imageUrl);
+    })
+    doc.images = imagesList;
+  }
+}
+
+// fineOne, findAll, update
+productSchema.post('init', (doc) => {
+  setImageUrl(doc);
+})
+
+// create
+productSchema.post('save', (doc) => {
+  setImageUrl(doc);
+})
+
 export default mongoose.model('Product', productSchema);

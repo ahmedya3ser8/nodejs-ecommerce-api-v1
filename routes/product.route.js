@@ -11,18 +11,20 @@ import {
   getProduct,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  resizeProductImages,
+  uploadProductImages
 } from '../services/product.service.js';
 
 const router = express.Router();
 
 router.route('/')
   .get(getProducts)
-  .post(createProductValidator, createProduct)
+  .post(uploadProductImages, resizeProductImages , createProductValidator, createProduct)
 
 router.route('/:id')
   .get(getProductValidator, getProduct)
-  .put(updateProductValidator, updateProduct)
+  .put(uploadProductImages, resizeProductImages, updateProductValidator, updateProduct)
   .delete(deleteProductValidator, deleteProduct)
 
 export default router;
