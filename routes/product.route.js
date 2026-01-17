@@ -15,16 +15,18 @@ import {
   resizeProductImages,
   uploadProductImages
 } from '../services/product.service.js';
+import protect from '../middlewares/protect.js';
+import allowedTo from '../middlewares/allowedTo.js';
 
 const router = express.Router();
 
 router.route('/')
   .get(getProducts)
-  .post(uploadProductImages, resizeProductImages , createProductValidator, createProduct)
+  .post(protect, allowedTo('admin'), uploadProductImages, resizeProductImages , createProductValidator, createProduct)
 
 router.route('/:id')
   .get(getProductValidator, getProduct)
-  .put(uploadProductImages, resizeProductImages, updateProductValidator, updateProduct)
-  .delete(deleteProductValidator, deleteProduct)
+  .put(protect, allowedTo('admin'), uploadProductImages, resizeProductImages, updateProductValidator, updateProduct)
+  .delete(protect, allowedTo('admin'), deleteProductValidator, deleteProduct)
 
 export default router;

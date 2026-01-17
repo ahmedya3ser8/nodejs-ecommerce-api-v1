@@ -16,6 +16,8 @@ import {
   resizeImage
 } from '../services/category.service.js';
 import subCategoryRoute from './subCategory.route.js';
+import protect from '../middlewares/protect.js';
+import allowedTo from '../middlewares/allowedTo.js';
 
 const router = express.Router();
 
@@ -23,11 +25,11 @@ router.use('/:categoryId/subcategories', subCategoryRoute)
 
 router.route('/')
   .get(getCategories)
-  .post(uploadCategoryImage, resizeImage, createCategoryValidator, createCategory)
+  .post(protect, allowedTo('admin'), uploadCategoryImage, resizeImage, createCategoryValidator, createCategory)
 
 router.route('/:id')
   .get(getCategoryValidator, getCategory)
-  .put(uploadCategoryImage, resizeImage, updateCategoryValidator, updateCategory)
-  .delete(deleteCategoryValidator, deleteCategory)
+  .put(protect, allowedTo('admin'), uploadCategoryImage, resizeImage, updateCategoryValidator, updateCategory)
+  .delete(protect, allowedTo('admin'), deleteCategoryValidator, deleteCategory)
 
 export default router;

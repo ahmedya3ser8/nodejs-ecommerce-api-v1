@@ -16,6 +16,8 @@ import {
   setCategoryIdToBody,
   createFilterObj
 } from '../services/subCategory.service.js';
+import protect from '../middlewares/protect.js';
+import allowedTo from '../middlewares/allowedTo.js';
 
 // mergeParams -> allow us to access parameters on other routers
 // ex -> we need to access categoryId from category router
@@ -23,11 +25,11 @@ const router = express.Router({ mergeParams: true });
 
 router.route('/')
   .get(createFilterObj, getSubCategories)
-  .post(setCategoryIdToBody, createSubCategoryValidator, createSubCategory)
+  .post(protect, allowedTo('admin'), setCategoryIdToBody, createSubCategoryValidator, createSubCategory)
 
 router.route('/:id')
   .get(getSubCategoryValidator, getSubCategory)
-  .put(updateSubCategoryValidator, updateSubCategory)
-  .delete(deleteSubCategoryValidator, deleteSubCategory)
+  .put(protect, allowedTo('admin'), updateSubCategoryValidator, updateSubCategory)
+  .delete(protect, allowedTo('admin'), deleteSubCategoryValidator, deleteSubCategory)
 
 export default router;

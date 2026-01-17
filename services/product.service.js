@@ -12,6 +12,7 @@ const uploadProductImages = uploadMixOfImages([
 ])
 
 const resizeProductImages = asyncHandler(async (req, res, next) => {
+  if (!req.files) return next();
   if (req.files.imageCover) {
     const imageCoverFileName = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
     await sharp(req.files.imageCover[0].buffer)
@@ -50,17 +51,17 @@ const getProduct = factory.getOne(ProductModel);
 
 // @desc Create Product
 // @route POST /api/v1/products
-// @acess Private
+// @acess Private/Admin
 const createProduct = factory.createOne(ProductModel);
 
 // @desc Update Specific Product By Id
 // @route PUT /api/v1/products/:id
-// @acess Private
+// @acess Private/Admin
 const updateProduct = factory.updateOne(ProductModel);
 
 // @desc delete Specific Product By Id
 // @route DELETE /api/v1/products/:id
-// @acess Private
+// @acess Private/Admin
 const deleteProduct = factory.deleteOne(ProductModel);
 
 export {

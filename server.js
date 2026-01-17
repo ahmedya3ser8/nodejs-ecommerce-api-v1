@@ -10,6 +10,7 @@ import subCategoryRoute from './routes/subCategory.route.js';
 import brandRoute from './routes/brand.route.js';
 import productRoute from './routes/product.route.js';
 import userRoute from './routes/user.route.js';
+import authRoute from './routes/auth.route.js';
 import AppError from './utils/AppError.js';
 import globalError from './middlewares/globalError.js';
 
@@ -33,6 +34,7 @@ app.use('/api/v1/subcategories', subCategoryRoute);
 app.use('/api/v1/brands', brandRoute);
 app.use('/api/v1/products', productRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/auth', authRoute);
 
 app.use((req, res, next) => {
   next(new AppError(`This resource: ${req.originalUrl} is not available`, 400));

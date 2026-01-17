@@ -9,6 +9,7 @@ import { uploadSingleImage } from '../middlewares/uploadImage.js';
 const uploadBrandImage = uploadSingleImage('image');
 
 const resizeImage = asyncHandler(async (req, res, next) => {
+  if (!req.file) return next();
   const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
     .resize(600,600)
@@ -32,17 +33,17 @@ const getBrand = factory.getOne(BrandModel);
 
 // @desc Create Brand
 // @route POST /api/v1/brands
-// @acess Private
+// @acess Private/Admin
 const createBrand = factory.createOne(BrandModel);
 
 // @desc Update Specific Brand By Id
 // @route PUT /api/v1/brands/:id
-// @acess Private
+// @acess Private/Admin
 const updateBrand = factory.updateOne(BrandModel);
 
 // @desc delete Specific Brand By Id
 // @route DELETE /api/v1/brands/:id
-// @acess Private
+// @acess Private/Admin
 const deleteBrand = factory.deleteOne(BrandModel);
 
 export {

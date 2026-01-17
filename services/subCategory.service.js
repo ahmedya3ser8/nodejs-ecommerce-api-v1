@@ -26,17 +26,17 @@ const getSubCategory = factory.getOne(SubCategoryModel);
 
 // @desc Create subCategory
 // @route POST /api/v1/subcategories
-// @acess Private
+// @acess Private/Admin
 const createSubCategory = factory.createOne(SubCategoryModel);
 
 // @desc Update Specific subCategory By Id
 // @route PUT /api/v1/subcategories/:id
-// @acess Private
+// @acess Private/Admin
 const updateSubCategory = factory.updateOne(SubCategoryModel);
 
 // @desc delete Specific subCategory By Id
 // @route DELETE /api/v1/subcategories/:id
-// @acess Private
+// @acess Private/Admin
 const deleteSubCategory = factory.deleteOne(SubCategoryModel);
 
 export {
