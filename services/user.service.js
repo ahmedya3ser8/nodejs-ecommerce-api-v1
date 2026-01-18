@@ -6,6 +6,7 @@ import UserModel from '../models/user.model.js';
 import factory from '../services/handlerFactory.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
 import AppError from '../utils/AppError.js';
+import generateJWT from '../utils/generateToken.js';
 import { uploadSingleImage } from '../middlewares/uploadImage.js';
 
 const uploadUserImage = uploadSingleImage('profileImage');
@@ -44,7 +45,7 @@ const createUser = factory.createOne(UserModel);
 // @route PUT /api/v1/users/:id
 // @acess Private/Admin
 const updateUser = asyncHandler(async (req, res, next) => {
-  const document = await UserModel.findByIdAndUpdate(req.params.id, {
+  const user = await UserModel.findByIdAndUpdate(req.params.id, {
     fullName: req.body.fullName,
     email: req.body.email,
     profileImage: req.body.profileImage,
@@ -52,11 +53,11 @@ const updateUser = asyncHandler(async (req, res, next) => {
     role: req.body.role,
     active: req.body.active,
   } , { new: true });
-  if (!document) {
-    return next(new AppError(`No document For This Id ${req.params.id}`, 404));
+  if (!user) {
+    return next(new AppError(`No user For This Id ${req.params.id}`, 404));
   }
   res.status(200).json({
-    data: document
+    data: user
   })
 })
 
@@ -64,22 +65,85 @@ const updateUser = asyncHandler(async (req, res, next) => {
 // @route PUT /api/v1/users/changePassword/:id
 // @acess Private/Admin
 const changeUserPassword = asyncHandler(async (req, res, next) => {
-  const document = await UserModel.findByIdAndUpdate(req.params.id, {
+  const user = await UserModel.findByIdAndUpdate(req.params.id, {
     password: await bcrypt.hash(req.body.password, 12),
     passwordChangeAt: Date.now()
   } , { new: true });
-  if (!document) {
-    return next(new AppError(`No document For This Id ${req.params.id}`, 404));
+  if (!user) {
+    return next(new AppError(`No user For This Id ${req.params.id}`, 404));
   }
   res.status(200).json({
-    data: document
+    data: user
   })
 })
 
-// @desc delete Specific User By Id
+// @desc Deactivate Specific User By Id
 // @route DELETE /api/v1/users/:id
 // @acess Private/Admin
-const deleteUser = factory.deleteOne(UserModel);
+const deleteUser = asyncHandler(async (req, res, next) => {
+  await UserModel.findByIdAndUpdate(req.params.id, { active: false });
+  return res.status(200).json({
+    status: 'success'
+  });
+})
+
+// @desc    Get Logged User Data
+// @route   GET /api/v1/users/getMe
+// @access  Private/Protect
+const getLoggedUserData = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+})
+
+// @desc    Update Logged User Password
+// @route   PUT /api/v1/users/updateMyPassword
+// @access  Private/Protect
+const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+  // 1) update user password based on user payload (req.user._id)
+  const user = await UserModel.findByIdAndUpdate(req.user._id, {
+    password: await bcrypt.hash(req.body.password, 12),
+    passwordChangeAt: Date.now()
+  } , { new: true });
+
+  user.password = undefined;
+
+  const token = generateJWT({
+    userId: user._id,
+    email: user.email,
+    role: user.role
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated successfully',
+    data: user,
+    token
+  })
+})
+
+// @desc    Update Logged User Data without(password, role, active)
+// @route   PUT /api/v1/users/updateMe
+// @access  Private/Protect
+const updateLoggedUserData = asyncHandler(async (req, res, next) => {
+  const updatedUser = await UserModel.findByIdAndUpdate(req.user._id, {
+    fullName: req.body.fullName,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber
+  }, { new: true });
+  return res.status(200).json({
+    data: updatedUser
+  })
+})
+
+// @desc    Deactivate Logged User
+// @route   DELETE /api/v1/users/deleteMe
+// @access  Private/Protect
+const deleteLoggedUserData = asyncHandler(async (req, res, next) => {
+  await UserModel.findByIdAndUpdate(req.user._id, { active: false });
+  return res.status(200).json({
+    status: 'success'
+  });
+})
 
 export {
   getUsers,
@@ -89,6 +153,9 @@ export {
   deleteUser,
   changeUserPassword,
   uploadUserImage,
-  resizeImage
+  resizeImage,
+  getLoggedUserData,
+  updateLoggedUserPassword,
+  updateLoggedUserData,
+  deleteLoggedUserData
 };
-

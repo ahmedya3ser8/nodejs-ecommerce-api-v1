@@ -32,7 +32,7 @@ const singUpValidator = [
     .optional()
     .isMobilePhone(['ar-EG', 'ar-SA']).withMessage('Invalid Phone Number only accept EGY and SAR Phone Numbers'),
   validator
-]
+];
 
 const loginValidator = [
   check('email')
@@ -42,9 +42,44 @@ const loginValidator = [
     .notEmpty().withMessage('Password is required')
     .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   validator
-]
+];
+
+const forgotPasswordValidator = [
+  check('email')
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Invalid email address'),
+  validator
+];
+
+const verifyResetCodeValidator = [
+  check('resetCode')
+    .notEmpty().withMessage('ResetCode is required')
+    .isLength({ min: 6, max: 6 }).withMessage('Reset Code must be 6 digits'),
+  validator
+];
+
+const resetPasswordValidator = [
+  check('email')
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Invalid email address'),
+  check('newPassword')
+    .notEmpty().withMessage('New Password is required')
+    .isLength({ min: 6 }).withMessage('New Password must be at least 6 characters')
+    .custom((password, { req }) => {
+      if (password !== req.body.confirmNewPassword) {
+        throw new Error('Confirm New Password incorrect')
+      }
+      return true;
+    }),
+  check('confirmNewPassword')
+    .notEmpty().withMessage('Confirm New Password is required'),
+  validator
+];
 
 export {
   singUpValidator,
-  loginValidator
+  loginValidator,
+  forgotPasswordValidator,
+  verifyResetCodeValidator,
+  resetPasswordValidator
 };

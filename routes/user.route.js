@@ -5,7 +5,9 @@ import {
   createUserValidator,
   updateUserValidator,
   deleteUserValidator,
-  changeUserPasswordValidator
+  changeUserPasswordValidator,
+  changeLoggedUserPasswordValidator,
+  updateLoggedUserValidator
 } from '../utils/validators/userValidator.js';
 import { 
   getUsers,
@@ -15,22 +17,37 @@ import {
   deleteUser,
   changeUserPassword,
   uploadUserImage,
-  resizeImage
+  resizeImage,
+  getLoggedUserData,
+  updateLoggedUserPassword,
+  updateLoggedUserData,
+  deleteLoggedUserData
 } from '../services/user.service.js';
 import protect from '../middlewares/protect.js';
 import allowedTo from '../middlewares/allowedTo.js';
 
 const router = express.Router();
 
-router.put('/changePassword/:id', protect, allowedTo('admin'), changeUserPasswordValidator, changeUserPassword)
+router.use(protect);
+
+// Logged User
+router.get('/getMe', getLoggedUserData, getUser);
+router.put('/changeMyPassword', changeLoggedUserPasswordValidator, updateLoggedUserPassword);
+router.put('/updateMe', updateLoggedUserValidator, updateLoggedUserData);
+router.delete('/deleteMe', deleteLoggedUserData);
+
+// Admin
+router.use(allowedTo('admin'));
+
+router.put('/changePassword/:id', changeUserPasswordValidator, changeUserPassword)
 
 router.route('/')
-  .get(protect, allowedTo('admin'), getUsers)
-  .post(protect, allowedTo('admin'), uploadUserImage, resizeImage, createUserValidator, createUser)
+  .get(getUsers)
+  .post(uploadUserImage, resizeImage, createUserValidator, createUser)
 
 router.route('/:id')
-  .get(protect, allowedTo('admin'), getUserValidator, getUser)
-  .put(protect, allowedTo('admin'), uploadUserImage, resizeImage, updateUserValidator, updateUser)
-  .delete(protect, allowedTo('admin'), deleteUserValidator, deleteUser)
+  .get(getUserValidator, getUser)
+  .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
+  .delete(deleteUserValidator, deleteUser)
 
 export default router;

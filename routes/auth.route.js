@@ -2,16 +2,25 @@ import express from 'express';
 
 import {
   singUpValidator,
-  loginValidator
+  loginValidator,
+  forgotPasswordValidator,
+  verifyResetCodeValidator,
+  resetPasswordValidator
 } from '../utils/validators/authValidator.js';
 import { 
   signUp,
-  login
+  login,
+  forgotPassword,
+  verifyPasswordResetCode,
+  resetPassword
 } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router.route('/signup').post(singUpValidator, signUp);
-router.route('/login').post(loginValidator, login);
+router.post('/signup', singUpValidator, signUp);
+router.post('/login', loginValidator, login);
+router.post('/forgotPassword', forgotPasswordValidator, forgotPassword);
+router.post('/verifyResetCode', verifyResetCodeValidator, verifyPasswordResetCode);
+router.put('/resetPassword', resetPasswordValidator, resetPassword);
 
 export default router;

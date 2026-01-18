@@ -6,7 +6,7 @@ import AppError from '../utils/AppError.js';
 
 const protect = asyncHandler(async (req, res, next) => {
   // 1) check if token exist
-  if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer')) {
+  if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
     return next(new AppError('Not authorized, please login to access this route', 401));
   }
   const token = req.headers.authorization.split(' ')[1];
@@ -20,7 +20,12 @@ const protect = asyncHandler(async (req, res, next) => {
     return next(new AppError('The user belonging to this token no longer exists', 401));
   }
 
-  // 4) check if user change password after token created
+  // 4) check if user active or not
+  if (!currentUser.active) {
+    return next(new AppError('This account is deactivated. Please contact support', 400));
+  }
+
+  // 5) check if user change password after token created
   if (currentUser.passwordChangeAt) {
     const passwordChangeTime = parseInt(currentUser.passwordChangeAt.getTime() / 1000, 10);
     console.log(passwordChangeTime, decoded.iat);
