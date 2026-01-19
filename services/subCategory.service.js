@@ -2,6 +2,7 @@ import SubCategoryModel from '../models/subCategory.model.js';
 import factory from '../services/handlerFactory.js';
 
 // Nested Route
+// GET /categories/696656db3d537603709cc673/subcategories
 const createFilterObj = (req, res, next) => {
   let filter = {};
   if (req.params.categoryId) filter = { category: req.params.categoryId };

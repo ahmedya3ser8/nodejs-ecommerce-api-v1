@@ -8,6 +8,8 @@ const deleteOne = (Model) => asyncHandler(async (req, res, next) => {
   if (!document) {
     return next(new AppError(`No document For This Id ${id}`, 404));
   }
+  // Trigger "deleteOne" event when update document
+  await document.deleteOne(); 
   res.status(204).send();
 });
 
@@ -16,6 +18,8 @@ const updateOne = (Model) => asyncHandler(async (req, res, next) => {
   if (!document) {
     return next(new AppError(`No document For This Id ${req.params.id}`, 404));
   }
+  // Trigger "save" event when update document
+  await document.save();
   res.status(200).json({
     data: document
   })
@@ -28,9 +32,13 @@ const createOne = (Model) => asyncHandler(async (req, res) => {
   })
 });
 
-const getOne = (Model) => asyncHandler(async (req, res, next) => {
+const getOne = (Model, options) => asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const document = await Model.findById(id).select('-__v');
+  let query = Model.findById(id).select('-__v');
+  if (options) {
+    query = query.populate(options)
+  }
+  const document = await query;
   if (!document) {
     return next(new AppError(`No document For This Id ${id}`, 404));
   }
