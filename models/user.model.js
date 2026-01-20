@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [6, 'Too Short password'],
     },
+    passwordChangeAt: Date,
+    passwordResetCode: String,
+    passwordResetExpires: Date,
+    passwordResetVerified: Boolean,
     role: {
       type: String,
       enum: ['user', 'admin'],
@@ -30,10 +34,23 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
-    passwordChangeAt: Date,
-    passwordResetCode: String,
-    passwordResetExpires: Date,
-    passwordResetVerified: Boolean,
+    // child reference (one to many)
+    wishlist: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Product'
+      }
+    ],
+    addresses: [
+      {
+        id: mongoose.Schema.ObjectId,
+        alias: String,
+        details: String,
+        phoneNumber: String,
+        city: String,
+        postalCode: String
+      }
+    ]
   }, 
   { timestamps: true }
 );
