@@ -4,16 +4,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import categoryRoute from './routes/category.route.js';
-import subCategoryRoute from './routes/subCategory.route.js';
-import brandRoute from './routes/brand.route.js';
-import productRoute from './routes/product.route.js';
-import userRoute from './routes/user.route.js';
-import authRoute from './routes/auth.route.js';
-import reviewRoute from './routes/review.route.js';
-import wishlistRoute from './routes/wishlist.route.js';
-import addressRoute from './routes/address.route.js';
-
+import mountRoutes from './routes/index.js';
 import dbConnection from './config/database.js';
 import AppError from './utils/AppError.js';
 import globalError from './middlewares/globalError.js';
@@ -33,15 +24,7 @@ if (process.env.NODE_ENV === 'development') {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-app.use('/api/v1/categories', categoryRoute);
-app.use('/api/v1/subcategories', subCategoryRoute);
-app.use('/api/v1/brands', brandRoute);
-app.use('/api/v1/products', productRoute);
-app.use('/api/v1/users', userRoute);
-app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/reviews', reviewRoute);
-app.use('/api/v1/wishlist', wishlistRoute);
-app.use('/api/v1/addressess', addressRoute);
+mountRoutes(app);
 
 app.use((req, res, next) => {
   next(new AppError(`This resource: ${req.originalUrl} is not available`, 400));

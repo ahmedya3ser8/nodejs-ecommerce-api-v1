@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import UserModel from '../models/user.model.js';
 import factory from '../services/handlerFactory.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../utils/appError.js';
 import generateJWT from '../utils/generateToken.js';
 import { uploadSingleImage } from '../middlewares/uploadImage.js';
 

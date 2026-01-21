@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 import asyncHandler from '../middlewares/asyncHandler.js';
 import UserModel from '../models/user.model.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../utils/appError.js';
 import generateJWT from '../utils/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
 
