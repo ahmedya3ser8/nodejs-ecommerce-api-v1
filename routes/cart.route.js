@@ -1,11 +1,10 @@
 import express from 'express';
 
-// import { 
-//   getBrandValidator,
-//   createBrandValidator,
-//   updateBrandValidator,
-//   deleteBrandValidator
-// } from '../utils/validators/brandValidator.js';
+import { 
+  addProductItemValidator,
+  removeProductItemValidator,
+  updateProductQuantityValidator
+} from '../utils/validators/cartValidator.js';
 import { 
   addProductToCart,
   getLoggedUserCart,
@@ -25,11 +24,11 @@ router.put('/applyCoupon', applyCoupon);
 
 router.route('/')
   .get(getLoggedUserCart)
-  .post(addProductToCart)
+  .post(addProductItemValidator, addProductToCart)
   .delete(clearLoggedUserCart)
 
 router.route('/:cartItemId')
-  .put(updateCartItemQuantity)
-  .delete(removeSpecificCartItem)
+  .put(updateProductQuantityValidator, updateCartItemQuantity)
+  .delete(removeProductItemValidator, removeSpecificCartItem)
 
 export default router;

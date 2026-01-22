@@ -1,0 +1,115 @@
+import asyncHandler from '../middlewares/asyncHandler.js';
+import OrderModel from '../models/order.model.js';
+import CartModel from '../models/cart.model.js';
+import ProductModel from '../models/product.model.js';
+import AppError from '../utils/AppError.js';
+import factory from './handlerFactory.js';
+
+const createFilterObj = (req, res, next) => {
+  let filter = {};
+  if (req.user.role === 'user') filter = { user: req.user._id };
+  req.filterObj = filter;
+  next();
+}
+
+// @desc    Create Cash Order
+// @route   POST /api/v1/orders/:cartId
+// @access  Private/User
+const createCashOrder = asyncHandler(async (req, res, next) => {
+  // app settings (added by admin)
+  const taxPrice = 0;
+  const shippingPrice = 0;
+
+  // 1) get cart based on cartId
+  const cart = await CartModel.findById(req.params.cartId);
+  if (!cart) {
+    return next(new AppError(`There is no cart with this id: ${req.params.cartId}`, 404))
+  }
+
+  // 2) if coupon apply take priceAfterDiscount if not take totalCartPrice
+  const cartPrice = cart.totalPriceAfterDiscount ? cart.totalPriceAfterDiscount : cart.totalCartPrice;
+  const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+
+  // 3) create order with cash
+  const order = await OrderModel.create({
+    user: req.user._id,
+    cartItems: cart.cartItems,
+    shippingAddress: req.body.shippingAddress,
+    totalOrderPrice
+  })
+
+  // 4) after create order decrease product quantity and increase product sold
+  if (order) {
+    const bulkOption = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+      }
+    }))
+    await ProductModel.bulkWrite(bulkOption, {});
+
+    // 5) clear user cart
+    await CartModel.findByIdAndDelete(req.params.cartId);
+  }
+  return res.status(201).json({
+    status: 'success',
+    data: order
+  })
+})
+
+// @desc    Get All Orders
+// @route   GET /api/v1/orders
+// @access  Private/User/Admin
+const getOrders = factory.getAll(OrderModel);
+
+// @desc    Get Specific Order
+// @route   GET /api/v1/orders/:id
+// @access  Private/User/Admin
+const getOrder = factory.getOne(OrderModel);
+
+// @desc    Update Order Paid Status
+// @route   PUT /api/v1/orders/:id/paid
+// @access  Private/Admin
+const updateOrderPaidStatus = asyncHandler( async (req, res, next) => {
+  const order = await OrderModel.findById(req.params.id);
+  if (!order) {
+    return next(new AppError(`There is no order with this id: ${req.params.id}`, 404))
+  }
+
+  order.isPaid = true;
+  order.paidAt = Date.now();
+  const updatedOrder = await order.save();
+  
+  return res.status(200).json({
+    status: 'success',
+    data: updatedOrder
+  })
+})
+
+// @desc    Update Order Delivered Status
+// @route   PUT /api/v1/orders/:id/deliver
+// @access  Private/Admin
+const updateOrderDeliveredStatus = asyncHandler( async (req, res, next) => {
+  const order = await OrderModel.findById(req.params.id);
+  if (!order) {
+    return next(new AppError(`There is no order with this id: ${req.params.id}`, 404))
+  }
+  
+  order.isDelivered = true;
+  order.deliveredAt = Date.now();
+  const updatedOrder = await order.save();
+
+  return res.status(200).json({
+    status: 'success',
+    data: updatedOrder
+  })
+})
+
+export {
+  createCashOrder,
+  getOrders,
+  getOrder,
+  updateOrderPaidStatus,
+  updateOrderDeliveredStatus,
+  createFilterObj
+}

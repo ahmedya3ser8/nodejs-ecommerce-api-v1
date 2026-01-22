@@ -146,7 +146,7 @@ const applyCoupon = asyncHandler(async (req, res, next) => {
   const cart = await CartModel.findOne({ user: req.user._id });
 
   // 3) calculate total cart price after discount
-  cart.totalPriceAfterDiscount = ((cart.totalCartPrice - coupon.discount) / 100).toFixed(2); // 99.66
+  cart.totalPriceAfterDiscount = (cart.totalCartPrice - (cart.totalCartPrice * coupon.discount) / 100).toFixed(2); // 99.66
 
   await cart.save();
   
