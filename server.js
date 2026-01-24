@@ -8,7 +8,7 @@ import compression from 'compression';
 
 import mountRoutes from './routes/index.js';
 import dbConnection from './config/database.js';
-import AppError from './utils/AppError.js';
+import AppError from './utils/appError.js';
 import globalError from './middlewares/globalError.js';
 
 const app = express();
