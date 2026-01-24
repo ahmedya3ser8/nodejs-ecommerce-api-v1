@@ -1,9 +1,12 @@
+import Stripe from 'stripe';
 import asyncHandler from '../middlewares/asyncHandler.js';
 import OrderModel from '../models/order.model.js';
 import CartModel from '../models/cart.model.js';
 import ProductModel from '../models/product.model.js';
 import AppError from '../utils/AppError.js';
 import factory from './handlerFactory.js';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET);
 
 const createFilterObj = (req, res, next) => {
   let filter = {};
@@ -105,11 +108,59 @@ const updateOrderDeliveredStatus = asyncHandler( async (req, res, next) => {
   })
 })
 
+// @desc    Get Checkout Session From Stripe And Send It As Response
+// @route   POST /api/v1/orders/checkout-session/:cartId
+// @access  Private/User
+const checkoutSession = asyncHandler(async (req, res, next) => {
+  // app settings (added by admin)
+  const taxPrice = 0;
+  const shippingPrice = 0;
+
+  // 1) get cart based on cartId
+  const cart = await CartModel.findById(req.params.cartId);
+  if (!cart) {
+    return next(new AppError(`There is no cart with this id: ${req.params.cartId}`, 404))
+  }
+
+  // 2) if coupon apply take priceAfterDiscount if not take totalCartPrice
+  const cartPrice = cart.totalPriceAfterDiscount ? cart.totalPriceAfterDiscount : cart.totalCartPrice;
+  const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+
+  // 3) create stripe checkout session
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        price_data: {
+          currency: 'egp',
+          product_data: {
+            name: `Order for ${req.user.fullName}`
+          },
+          unit_amount: totalOrderPrice * 100
+        },
+        quantity: 1
+      }
+    ],
+    mode: 'payment',
+    success_url: `${req.protocol}://${req.get('host')}/orders`,
+    cancel_url: `${req.protocol}://${req.get('host')}/cart`,
+    customer_email: req.user.email,
+    client_reference_id: req.params.cartId,
+    metadata: req.body.shippingAddress
+  })
+
+  // 4) send session to eesponse
+  return res.status(200).json({
+    status: 'success',
+    session
+  })
+})
+
 export {
   createCashOrder,
   getOrders,
   getOrder,
   updateOrderPaidStatus,
   updateOrderDeliveredStatus,
+  checkoutSession,
   createFilterObj
 }

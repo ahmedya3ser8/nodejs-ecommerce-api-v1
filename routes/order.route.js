@@ -6,6 +6,7 @@ import {
   getOrder,
   updateOrderPaidStatus,
   updateOrderDeliveredStatus,
+  checkoutSession,
   createFilterObj
 } from '../services/order.service.js';
 import protect from '../middlewares/protect.js';
@@ -15,11 +16,13 @@ const router = express.Router();
 
 router.use(protect);
 
+router.post('/checkout-session/:cartId', allowedTo('user'), checkoutSession)
+
 router.route('/:cartId').post(allowedTo('user'), createCashOrder)
 
-router.route('/').get(allowedTo('user', 'admin'), createFilterObj, getOrders)
+router.get('/', allowedTo('user', 'admin'), createFilterObj, getOrders)
 
-router.route('/:id').get(allowedTo('user', 'admin'), getOrder)
+router.get('/:id', allowedTo('user', 'admin'), getOrder)
 
 router.put('/:id/paid', allowedTo('admin'), updateOrderPaidStatus);
 router.put('/:id/deliver', allowedTo('admin'), updateOrderDeliveredStatus);
