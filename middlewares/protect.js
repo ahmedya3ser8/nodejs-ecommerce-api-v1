@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import asyncHandler from "./asyncHandler.js";
 import UserModel from '../models/user.model.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../utils/appError.js';
 
 const protect = asyncHandler(async (req, res, next) => {
   // 1) check if token exist

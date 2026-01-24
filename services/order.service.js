@@ -3,7 +3,7 @@ import asyncHandler from '../middlewares/asyncHandler.js';
 import OrderModel from '../models/order.model.js';
 import CartModel from '../models/cart.model.js';
 import ProductModel from '../models/product.model.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../utils/appError.js';
 import factory from './handlerFactory.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET);

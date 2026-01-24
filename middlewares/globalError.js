@@ -1,4 +1,4 @@
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 
 const globalError = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {

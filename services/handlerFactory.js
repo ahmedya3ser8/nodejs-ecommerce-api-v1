@@ -1,5 +1,5 @@
 import asyncHandler from '../middlewares/asyncHandler.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../utils/appError.js';
 import ApiFeatures from '../utils/apiFeatures.js';
 
 const deleteOne = (Model) => asyncHandler(async (req, res, next) => {

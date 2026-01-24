@@ -1,6 +1,6 @@
 import multer from 'multer';
 
-import AppError from '../utils/AppError.js'; 
+import AppError from '../utils/appError.js'; 
 
 const multerOptions = () => {
   // 1) DiskStorage
