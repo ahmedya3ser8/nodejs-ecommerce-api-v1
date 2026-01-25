@@ -201,6 +201,7 @@ const createCardOrder = async (session) => {
 // @route   POST /webhook-checkout
 // @access  Private/User
 const webhookCheckout = asyncHandler(async (req, res, next) => {
+  console.log("🔥 STRIPE HIT RAILWAY");
   const sig = req.headers["stripe-signature"];
   let event;
   try {

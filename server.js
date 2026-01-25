@@ -20,10 +20,10 @@ const __dirname = path.dirname(__filename);
 // connect with DataBase
 dbConnection();
 
+app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
+
 app.use(cors());
 app.use(compression());
-
-app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'uploads')));
