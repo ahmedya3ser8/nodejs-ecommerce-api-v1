@@ -10,6 +10,7 @@ import mountRoutes from './routes/index.js';
 import dbConnection from './config/database.js';
 import AppError from './utils/appError.js';
 import globalError from './middlewares/globalError.js';
+import { webhookCheckout } from './services/order.service.js';
 
 const app = express();
 
@@ -19,11 +20,12 @@ const __dirname = path.dirname(__filename);
 // connect with DataBase
 dbConnection();
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'uploads')));
-
 app.use(cors());
 app.use(compression());
+app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
