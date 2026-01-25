@@ -172,7 +172,8 @@ const createCardOrder = async (session) => {
     totalOrderPrice: oderPrice,
     isPaid: true,
     paidAt: Date.now(),
-    paymentMethodType: 'card'
+    paymentMethodType: 'card',
+    stripeSessionId: session.id
   });
 
   // 2) after create order decrease product quantity and increase product sold
@@ -204,7 +205,7 @@ const webhookCheckout = asyncHandler(async (req, res, next) => {
   }
   if (event.type === 'checkout.session.completed') {
     console.log("Payment success");
-    createCardOrder(event.data.object);
+    await createCardOrder(event.data.object);
   }
   return res.status(200).json({ received: true });
 })
