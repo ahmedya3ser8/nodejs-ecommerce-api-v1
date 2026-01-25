@@ -20,7 +20,11 @@ const __dirname = path.dirname(__filename);
 // connect with DataBase
 dbConnection();
 
-app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
+// app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
+app.post("/webhook-checkout", (req, res) => {
+  console.log("🔥🔥🔥 WEBHOOK HIT 🔥🔥🔥");
+  res.status(200).send("ok");
+});
 
 app.use(cors());
 app.use(compression());
