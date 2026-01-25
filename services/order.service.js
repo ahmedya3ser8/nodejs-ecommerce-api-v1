@@ -158,11 +158,18 @@ const checkoutSession = asyncHandler(async (req, res, next) => {
 
 const createCardOrder = async (session) => {
   const cartId = session.client_reference_id;
-  const shippingAddress = session.metadata;
+  const shippingAddress = session.metadata || {};
   const oderPrice = session.amount_total / 100;
 
   const cart = await CartModel.findById(cartId);
+  if (!cart) {
+    return next(new AppError(`There is no cart with this id: ${cartId}`, 404))
+  }
+
   const user = await UserModel.findOne({ email: session.customer_email });
+  if (!user) {
+    return next(new AppError(`There is no user with this id: ${user._id}`, 404))
+  }
 
   // 1) create order with card
   const order = await OrderModel.create({
@@ -172,8 +179,7 @@ const createCardOrder = async (session) => {
     totalOrderPrice: oderPrice,
     isPaid: true,
     paidAt: Date.now(),
-    paymentMethodType: 'card',
-    stripeSessionId: session.id
+    paymentMethodType: 'card'
   });
 
   // 2) after create order decrease product quantity and increase product sold
@@ -207,7 +213,7 @@ const webhookCheckout = asyncHandler(async (req, res, next) => {
     console.log("Payment success");
     await createCardOrder(event.data.object);
   }
-  return res.status(200).json({ received: true });
+  res.status(200).json({ received: true });
 })
 
 export {
