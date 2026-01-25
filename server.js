@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 
 app.use(globalError);
 
-const server = app.listen(process.env.PORT || 4000, () => {
+const server = app.listen(process.env.PORT, () => {
   console.log(`App Running on port ${process.env.PORT}`);
 })
 
