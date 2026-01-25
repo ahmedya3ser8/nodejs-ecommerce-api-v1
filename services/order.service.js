@@ -3,6 +3,7 @@ import asyncHandler from '../middlewares/asyncHandler.js';
 import OrderModel from '../models/order.model.js';
 import CartModel from '../models/cart.model.js';
 import ProductModel from '../models/product.model.js';
+import UserModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 import factory from './handlerFactory.js';
 
@@ -155,6 +156,43 @@ const checkoutSession = asyncHandler(async (req, res, next) => {
   })
 })
 
+const createCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const oderPrice = session.amount_total / 100;
+
+  const cart = await CartModel.findById(cartId);
+  const user = await UserModel.findOne({ email: session.customer_email });
+
+  // 1) create order with card
+  const order = await OrderModel.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: oderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: 'card'
+  });
+
+  // 2) after create order decrease product quantity and increase product sold
+  if (order) {
+    const bulkOption = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+      }
+    }))
+    await ProductModel.bulkWrite(bulkOption, {});
+
+    // 3) clear user cart
+    await CartModel.findByIdAndDelete(cartId);
+  }
+}
+
+// @desc    Webhook Will Run When Stripe Payment Success
+// @route   POST /webhook-checkout
+// @access  Private/User
 const webhookCheckout = asyncHandler(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
   let event;
@@ -166,7 +204,9 @@ const webhookCheckout = asyncHandler(async (req, res, next) => {
   }
   if (event.type === 'checkout.session.completed') {
     console.log("Payment success");
+    await createCardOrder(event.data.object);
   }
+  return res.status(200).json({ received: true });
 })
 
 export {
