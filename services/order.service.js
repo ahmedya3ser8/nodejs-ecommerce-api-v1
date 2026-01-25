@@ -204,7 +204,7 @@ const webhookCheckout = asyncHandler(async (req, res, next) => {
   }
   if (event.type === 'checkout.session.completed') {
     console.log("Payment success");
-    await createCardOrder(event.data.object);
+    createCardOrder(event.data.object);
   }
   return res.status(200).json({ received: true });
 })
