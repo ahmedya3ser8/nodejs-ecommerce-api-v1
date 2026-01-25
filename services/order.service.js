@@ -162,14 +162,7 @@ const createCardOrder = async (session) => {
   const oderPrice = session.amount_total / 100;
 
   const cart = await CartModel.findById(cartId);
-  if (!cart) {
-    return next(new AppError(`There is no cart with this id: ${cartId}`, 404))
-  }
-
   const user = await UserModel.findOne({ email: session.customer_email });
-  if (!user) {
-    return next(new AppError(`There is no user with this id: ${user._id}`, 404))
-  }
 
   // 1) create order with card
   const order = await OrderModel.create({
