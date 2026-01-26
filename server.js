@@ -5,6 +5,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 import compression from 'compression';
+import { rateLimit } from 'express-rate-limit'
+import hpp from 'hpp';
+import helmet from "helmet";
 
 import mountRoutes from './routes/index.js';
 import dbConnection from './config/database.js';
@@ -20,18 +23,56 @@ const __dirname = path.dirname(__filename);
 // connect with DataBase
 dbConnection();
 
-app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
+// There is error here (not working yet)
+app.post(
+  '/webhook-checkout', 
+  express.raw({ type: 'application/json' }), 
+  webhookCheckout)
+; 
 
 app.use(cors());
 app.use(compression());
 
-app.use(express.json());
+app.use(express.json({ limit: '20kb' }));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
+
+// To apply data Sanitize
+// app.use(mongoSanitize()); and use xss-clean
+
+app.use(helmet());
+
+const authLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	limit: 5,
+  message: { error: 'Too many requests, please try again later after: (15 min)' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+const passwordLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	limit: 3,
+  message: { error: `Too many requests, please try again later after: (15 min)` },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+app.post('/api/v1/auth/signup', authLimiter);
+app.post('/api/v1/auth/login', authLimiter);
+
+app.post('/api/v1/auth/forgotPassword', passwordLimiter);
+app.post('/api/v1/auth/verifyResetCode', passwordLimiter);
+app.post('/api/v1/auth/resetPassword', passwordLimiter);
+
+// Protect Against multiple HTTP parameters
+app.use(
+  hpp({ whitelist: ['price', 'sold', 'quantity', 'ratingsAverage', 'ratingsQuantity'] })
+);
 
 // Routes
 mountRoutes(app);
