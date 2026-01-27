@@ -8,6 +8,7 @@ import compression from 'compression';
 import { rateLimit } from 'express-rate-limit'
 import hpp from 'hpp';
 import helmet from "helmet";
+import cookieParser from 'cookie-parser';
 
 import mountRoutes from './routes/index.js';
 import dbConnection from './config/database.js';
@@ -41,10 +42,8 @@ if (process.env.NODE_ENV === 'development') {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-// To apply data Sanitize
-// app.use(mongoSanitize()); and use xss-clean
-
 app.use(helmet());
+app.use(cookieParser());
 
 const authLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,

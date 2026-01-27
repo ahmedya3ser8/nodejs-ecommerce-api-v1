@@ -7,6 +7,15 @@ import AppError from '../utils/appError.js';
 import generateJWT from '../utils/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
 
+const sanitizeUser = function(user) {
+  return {
+    _id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    phoneNumber: user.phoneNumber
+  };
+};
+
 // @desc    SignUp
 // @route   POST /api/v1/auth/signup
 // @access  Public
@@ -24,10 +33,15 @@ const signUp = asyncHandler(async (req, res, next) => {
     role: user.role
   });
 
-  user.password = undefined;
+  res.cookie('jwt', token, {
+    maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict', 
+    httpOnly: true
+  })
 
   return res.status(201).json({
-    data: user,
+    data: sanitizeUser(user),
     token
   })
 })
@@ -47,10 +61,15 @@ const login = asyncHandler(async (req, res, next) => {
     role: user.role
   });
 
-  user.password = undefined;
+  res.cookie('jwt', token, {
+    maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict', 
+    httpOnly: true
+  })
 
   return res.status(200).json({
-    data: user,
+    data: sanitizeUser(user),
     token
   })
 })
@@ -145,6 +164,13 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     email: user.email,
     role: user.role
   });
+
+  res.cookie('jwt', token, {
+    maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict', 
+    httpOnly: true
+  })
 
   return res.status(200).json({
     status: 'success',

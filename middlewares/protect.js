@@ -6,10 +6,17 @@ import AppError from '../utils/appError.js';
 
 const protect = asyncHandler(async (req, res, next) => {
   // 1) check if token exist
-  if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+
+  // if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+  //   return next(new AppError('Not authorized, please login to access this route', 401));
+  // }
+  // const token = req.headers.authorization.split(' ')[1];
+
+  const token = req.cookies.jwt;
+
+  if (!token) {
     return next(new AppError('Not authorized, please login to access this route', 401));
   }
-  const token = req.headers.authorization.split(' ')[1];
 
   // 2) verify token (changes happen, expire token)
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
