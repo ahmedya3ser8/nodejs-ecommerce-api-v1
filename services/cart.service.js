@@ -31,7 +31,7 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
     })
   } else {
     // 1) if product exist in cart then update product quantity
-    const productIndex = cart.cartItems.findIndex(item => item.product.toString() === productId && item.color === color);
+    const productIndex = cart.cartItems.findIndex(item => item.product._id.toString() === productId && item.color === color);
     if (productIndex > -1) {
       // update quantity
       // const cartItem  = cart.cartItems[productIndex];
