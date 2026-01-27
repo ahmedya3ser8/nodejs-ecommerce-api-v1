@@ -36,7 +36,6 @@ const signUp = asyncHandler(async (req, res, next) => {
   res.cookie('jwt', token, {
     maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict', 
     httpOnly: true
   })
 
@@ -64,7 +63,6 @@ const login = asyncHandler(async (req, res, next) => {
   res.cookie('jwt', token, {
     maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict', 
     httpOnly: true
   })
 
@@ -167,8 +165,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 
   res.cookie('jwt', token, {
     maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict', 
+    secure: process.env.NODE_ENV === 'production', 
     httpOnly: true
   })
 
