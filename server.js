@@ -31,7 +31,22 @@ app.post(
   webhookCheckout)
 ; 
 
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://eshop-api-v1.up.railway.app'
+]
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      cb(new AppError('Not allowed by CORS', 403))
+    }
+  },
+  credentials: true
+}));
+
 app.use(compression());
 
 app.use(express.json({ limit: '20kb' }));
