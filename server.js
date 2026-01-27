@@ -36,16 +36,15 @@ const allowedOrigins = [
   'https://eshop-api-v1.up.railway.app'
 ]
 
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      cb(null, true);
-    } else {
-      cb(new AppError('Not allowed by CORS', 403))
-    }
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+    else callback(new Error('Not allowed by CORS'));
   },
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(compression());
 

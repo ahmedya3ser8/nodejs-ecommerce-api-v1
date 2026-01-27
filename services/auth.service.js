@@ -34,8 +34,9 @@ const signUp = asyncHandler(async (req, res, next) => {
   });
 
   res.cookie('jwt', token, {
-    maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
+    maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days,
     secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     httpOnly: true
   })
 
@@ -61,8 +62,9 @@ const login = asyncHandler(async (req, res, next) => {
   });
 
   res.cookie('jwt', token, {
-    maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
+    maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days,
     secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     httpOnly: true
   })
 
@@ -164,8 +166,9 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   });
 
   res.cookie('jwt', token, {
-    maxAge: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90d
+    maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days,
     secure: process.env.NODE_ENV === 'production', 
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     httpOnly: true
   })
 
