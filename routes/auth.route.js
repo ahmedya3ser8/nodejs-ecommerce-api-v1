@@ -12,7 +12,8 @@ import {
   login,
   forgotPassword,
   verifyPasswordResetCode,
-  resetPassword
+  resetPassword,
+  logout
 } from '../services/auth.service.js';
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.post('/login', loginValidator, login);
 router.post('/forgotPassword', forgotPasswordValidator, forgotPassword);
 router.post('/verifyResetCode', verifyResetCodeValidator, verifyPasswordResetCode);
 router.put('/resetPassword', resetPasswordValidator, resetPassword);
+router.post('/logout', logout);
 
 export default router;

@@ -179,10 +179,26 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   })
 });
 
+// @desc    Logout User
+// @route   POST /api/v1/auth/logout
+// @access  Public
+const logout = asyncHandler(async (req, res, next) => {
+  res.clearCookie('jwt', {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    httpOnly: true
+  })
+  return res.status(200).json({
+    status: 'success',
+    message: 'Logout successfully'
+  })
+})
+
 export {
   signUp,
   login,
   forgotPassword,
   verifyPasswordResetCode,
-  resetPassword
+  resetPassword,
+  logout
 }
