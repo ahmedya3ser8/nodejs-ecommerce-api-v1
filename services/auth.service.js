@@ -12,7 +12,8 @@ const sanitizeUser = function(user) {
     _id: user._id,
     fullName: user.fullName,
     email: user.email,
-    phoneNumber: user.phoneNumber
+    phoneNumber: user.phoneNumber,
+    role: user.role
   };
 };
 
